@@ -21,6 +21,7 @@
 # include <sys/time.h>
 # include <sys/wait.h>
 # include <unistd.h>
+# include <pthread.h>
 
 typedef struct s_philosopher
 {

@@ -17,8 +17,6 @@ int	is_valid_number(char *str)
 	int	i;
 
 	i = 0;
-	if (str[i] == '+' || str[i] == '-')
-		i++;
 	if (!str[i])
 		return (0);
 	while (str[i])
@@ -64,11 +62,13 @@ void	cleanup_resources(t_philodata *philo_data)
 	sem_close(philo_data->write_sem);
 	sem_close(philo_data->status_sem);
 	sem_close(philo_data->meal_sem);
+	sem_close(philo_data->end_sem); 
 	sem_unlink("/simulation");
 	sem_unlink("/forks");
 	sem_unlink("/write");
 	sem_unlink("/status");
 	sem_unlink("/meal");
+	sem_unlink("/end");
 	if (philo_data->forks)
 		free(philo_data->forks);
 	free(philo_data->philosophers);

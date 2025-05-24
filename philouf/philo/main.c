@@ -104,12 +104,16 @@ int	main(int ac, char **av)
 	t_philo		*philosophers;
 
 	i = 1;
+	if (ac < 5 || ac > 6)
+		return (printf("Error: wrong number of arguments\n"), 1);
 	while (i < ac)
 	{
-		if (!is_valid_number(av[i]))
-			return (printf("Error: argument %d is not a valid number\n", i), 1);
+		if (ft_atoi(av[1]) <= 0)
+      	  return (printf("Error: number of philosophers must be positive\n"), 1);
 		i++;
 	}
+	if (!is_valid_number(av[i]))
+			return (printf("Error: argument %d is not a valid number\n", i), 1);
 	if (!allocate_resources(&philo_data, &philosophers, ac, av))
 		return (1);
 	init_philo(philosophers, philo_data);

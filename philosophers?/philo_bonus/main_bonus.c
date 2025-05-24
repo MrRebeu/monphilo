@@ -69,6 +69,21 @@ int	begin_simulation_bonus(t_philo *philosophers, t_philodata *philo_data)
 	int	i;
 
 	(void)philosophers;
+    if (philo_data->philo_nb == 1)
+	{
+		philo_data->philosophers[0].pid = fork();
+		if (philo_data->philosophers[0].pid == 0)
+		{
+			print_status(philo_data, 1, "has taken a fork");
+			ft_sleep(philo_data->time_to_die);
+			sem_wait(philo_data->write_sem);
+			printf("%lld %d died\n", get_time_ms() - philo_data->start_time, 1);
+			sem_post(philo_data->write_sem);
+			exit(1);
+		}
+		waitpid(philo_data->philosophers[0].pid, NULL, 0);
+		return (0);
+	}
 	i = 0;
 	while (i < philo_data->philo_nb)
 	{
@@ -98,12 +113,16 @@ int	main(int ac, char **av)
 	int			i;
 
 	i = 1;
+	if (ac < 5 || ac > 6)
+		return (printf("Error: wrong number of arguments\n"), 1);
 	while (i < ac)
 	{
 		if (!is_valid_number(av[i]))
 			return (printf("Error: argument %d is not a valid number\n", i), 1);
 		i++;
 	}
+	if (ft_atoi(av[1]) <= 0)
+        return (printf("Error: number of philosophers must be positive\n"), 1);
 	if (ac < 5 || ac > 6)
 		return (printf("Error: wrong number of arguments\n"), 1);
 	philo_data = malloc(sizeof(t_philodata));
