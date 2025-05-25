@@ -6,7 +6,7 @@
 /*   By: abkhefif <abkhefif@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/26 15:15:58 by abkhefif          #+#    #+#             */
-/*   Updated: 2025/05/18 14:45:50 by abkhefif         ###   ########.fr       */
+/*   Updated: 2025/05/25 18:01:26 by abkhefif         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -57,14 +57,14 @@ int	check_simulation_status_bonus(t_philodata *data)
 
 void	cleanup_resources(t_philodata *philo_data)
 {
-	sem_close(philo_data->finished_eating_sem);  // ✅ AJOUTER
-	sem_unlink("/finished_eating"); 
+	sem_close(philo_data->finished_eating_sem);
+	sem_unlink("/finished_eating");
 	sem_close(philo_data->simulation_sem);
 	sem_close(philo_data->forks_sem);
 	sem_close(philo_data->write_sem);
 	sem_close(philo_data->status_sem);
 	sem_close(philo_data->meal_sem);
-	sem_close(philo_data->end_sem); 
+	sem_close(philo_data->end_sem);
 	sem_unlink("/simulation");
 	sem_unlink("/forks");
 	sem_unlink("/write");
@@ -75,4 +75,22 @@ void	cleanup_resources(t_philodata *philo_data)
 		free(philo_data->forks);
 	free(philo_data->philosophers);
 	free(philo_data);
+}
+
+int	validate_arguments(int ac, char **av)
+{
+	int	i;
+
+	if (ac < 5 || ac > 6)
+		return (printf("Error: wrong number of arguments\n"), 0);
+	i = 1;
+	while (i < ac)
+	{
+		if (!is_valid_number(av[i]))
+			return (printf("Error: argument %d is not a valid number\n", i), 0);
+		i++;
+	}
+	if (ft_atoi(av[1]) <= 0)
+		return (printf("Error: number of philosophers must be positive\n"), 0);
+	return (1);
 }

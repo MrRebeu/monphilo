@@ -9,17 +9,18 @@ BONUS_DIR = philo_bonus
 LIBFT_DIR = libft
 
 SRCS =	$(MANDATORY_DIR)/main.c \
-    	$(MANDATORY_DIR)/utils.c \
-		$(MANDATORY_DIR)/utils2.c \
-		$(MANDATORY_DIR)/init.c \
-		$(MANDATORY_DIR)/routine.c
+	$(MANDATORY_DIR)/utils.c \
+	$(MANDATORY_DIR)/utils2.c \
+	$(MANDATORY_DIR)/init.c \
+	$(MANDATORY_DIR)/routine.c
 
 BONUS_SRCS = 	$(BONUS_DIR)/init_bonus.c \
-				$(BONUS_DIR)/main_bonus.c \
-				$(BONUS_DIR)/routine_bonus.c \
-				$(BONUS_DIR)/utils_bonus.c \
-				$(BONUS_DIR)/utils_bonus2.c
-				
+		$(BONUS_DIR)/main_bonus.c \
+		$(BONUS_DIR)/routine_bonus.c \
+		$(BONUS_DIR)/utils_bonus.c \
+		$(BONUS_DIR)/utils_bonus2.c \
+		$(BONUS_DIR)/utils_bonus3.c
+		
 HEADERS = $(MANDATORY_DIR)/philosophers.h
 BONUS_HEADERS = $(BONUS_DIR)/philosophers_bonus.h
 

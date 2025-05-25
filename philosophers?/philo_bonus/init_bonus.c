@@ -6,7 +6,7 @@
 /*   By: abkhefif <abkhefif@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/26 14:53:23 by abkhefif          #+#    #+#             */
-/*   Updated: 2025/05/18 14:44:43 by abkhefif         ###   ########.fr       */
+/*   Updated: 2025/05/25 18:02:17 by abkhefif         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -31,32 +31,6 @@ void	init_philo_bonus(t_philodata *philo_data, t_philo *philosophers)
 	}
 }
 
-int	init_fork_semaphores(t_philodata *philo_data)
-{
-	char	sem_name[20];
-	char	*num_str;
-	int		i;
-
-	philo_data->forks = malloc(sizeof(sem_t *) * philo_data->philo_nb);
-	if (!philo_data->forks)
-		return (0);
-	i = 0;
-	while (i < philo_data->philo_nb)
-	{
-		ft_memset(sem_name, 0, 20);
-		sem_name[0] = '/';
-		sem_name[1] = 'f';
-		sem_name[2] = '_';
-		num_str = ft_itoa(i);
-		ft_strcat(sem_name, num_str);
-		free(num_str);
-		sem_unlink(sem_name);
-		philo_data->forks[i] = sem_open(sem_name, O_CREAT, 0644, 1);
-		i++;
-	}
-	return (1);
-}
-
 int	init_philo_data_basic(int ac, char **av, t_philodata *philo_data)
 {
 	philo_data->philo_nb = ft_atoi(av[1]);
@@ -79,7 +53,8 @@ int	init_global_semaphores(t_philodata *philo_data)
 	sem_unlink("/meal");
 	sem_unlink("/end");
 	sem_unlink("/finished_eating");
-    philo_data->finished_eating_sem = sem_open("/finished_eating", O_CREAT, 0644, 0);
+	philo_data->finished_eating_sem = sem_open("/finished_eating", O_CREAT,
+			0644, 0);
 	philo_data->simulation_sem = sem_open("/simulation", O_CREAT, 0644, 1);
 	philo_data->forks_sem = sem_open("/forks", O_CREAT, 0644,
 			philo_data->philo_nb);
@@ -109,4 +84,14 @@ int	init_data_philo_bonus(int ac, char **av, t_philodata *philo_data)
 	philo_data->forks = NULL;
 	philo_data->start_time = get_time_ms();
 	return (1);
+}
+
+int	check_end_signal(t_philodata *philo_data)
+{
+	if (sem_trywait(philo_data->end_sem) == 0)
+	{
+		sem_post(philo_data->end_sem);
+		return (1);
+	}
+	return (0);
 }

@@ -6,7 +6,7 @@
 /*   By: abkhefif <abkhefif@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/26 15:09:24 by abkhefif          #+#    #+#             */
-/*   Updated: 2025/03/26 15:15:47 by abkhefif         ###   ########.fr       */
+/*   Updated: 2025/05/25 18:23:15 by abkhefif         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -50,7 +50,7 @@ void	ft_sleep(long long duration_ms)
 		elapsed_time = current_time - start_time;
 		if (elapsed_time > duration_ms)
 			break ;
-		usleep(1000);
+		usleep(500);
 	}
 }
 
