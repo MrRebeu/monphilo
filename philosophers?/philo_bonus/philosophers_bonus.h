@@ -52,7 +52,7 @@ typedef struct s_philodata
 	sem_t				**forks;
 	sem_t				*simulation_sem;
 	sem_t				*end_sem;
-
+	sem_t				*finished_eating_sem;
 }						t_philodata;
 
 int						check_simulation_status_bonus(t_philodata *data);
@@ -60,8 +60,8 @@ void					init_philo_bonus(t_philodata *philo_data,
 							t_philo *philosophers);
 int						init_data_philo_bonus(int ac, char **av,
 							t_philodata *philo_data);
-int						begin_simulation_bonus(t_philo *philosophers,
-							t_philodata *philo_data);
+int    begin_simulation_bonus(t_philo *philosophers,
+       t_philodata *philo_data, pid_t *pids);
 void					print_status(t_philodata *data, int id, char *message);
 void					philosopher_routine_bonus(t_philo *philo);
 long long				get_time_ms(void);

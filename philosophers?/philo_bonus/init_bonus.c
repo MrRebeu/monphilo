@@ -78,6 +78,8 @@ int	init_global_semaphores(t_philodata *philo_data)
 	sem_unlink("/status");
 	sem_unlink("/meal");
 	sem_unlink("/end");
+	sem_unlink("/finished_eating");
+    philo_data->finished_eating_sem = sem_open("/finished_eating", O_CREAT, 0644, 0);
 	philo_data->simulation_sem = sem_open("/simulation", O_CREAT, 0644, 1);
 	philo_data->forks_sem = sem_open("/forks", O_CREAT, 0644,
 			philo_data->philo_nb);

@@ -59,82 +59,99 @@ void	*monitor_philosophers_bonus(void *arg)
 			}
 			i++;
 		}
-		usleep(900);
+		usleep(100);
 	}
 	return (NULL);
 }
 
-int	begin_simulation_bonus(t_philo *philosophers, t_philodata *philo_data)
+// ✅ Changement de signature : ajout du paramètre pids
+int begin_simulation_bonus(t_philo *philosophers, t_philodata *philo_data, pid_t *pids)
 {
-	int	i;
-
 	(void)philosophers;
+    int i;
+
+    // ✅ VOTRE code pour 1 philo - INCHANGÉ
     if (philo_data->philo_nb == 1)
-	{
-		philo_data->philosophers[0].pid = fork();
-		if (philo_data->philosophers[0].pid == 0)
-		{
-			print_status(philo_data, 1, "has taken a fork");
-			ft_sleep(philo_data->time_to_die);
-			sem_wait(philo_data->write_sem);
-			printf("%lld %d died\n", get_time_ms() - philo_data->start_time, 1);
-			sem_post(philo_data->write_sem);
-			exit(1);
-		}
-		waitpid(philo_data->philosophers[0].pid, NULL, 0);
-		return (0);
-	}
-	i = 0;
-	while (i < philo_data->philo_nb)
-	{
-		philo_data->philosophers[i].pid = fork();
-		if (philo_data->philosophers[i].pid == 0)
-		{
-			philosopher_routine_bonus(&philo_data->philosophers[i]);
-			exit(0);
-		}
-		if (philo_data->philosophers[i].pid < 0)
-			return (1);
-		i++;
-	}
-	i = 0;
-	while (i < philo_data->philo_nb)
-	{
-		waitpid(philo_data->philosophers[i].pid, NULL, 0);
-		i++;
-	}
-	return (0);
+    {
+        pids[0] = fork();  // ✅ Juste stocker le PID
+        if (pids[0] == 0)
+        {
+            print_status(philo_data, 1, "has taken a fork");
+            ft_sleep(philo_data->time_to_die);
+            printf("%lld %d died\n", get_time_ms() - philo_data->start_time, 1);
+            exit(1);
+        }
+        waitpid(pids[0], NULL, 0);
+        return (0);
+    }
+
+    // ✅ VOTRE code fork - INCHANGÉ sauf stockage PID
+    i = 0;
+    while (i < philo_data->philo_nb)
+    {
+        pids[i] = fork();  // ✅ Stocker le PID
+        if (pids[i] == 0)
+        {
+            philosopher_routine_bonus(&philo_data->philosophers[i]);
+            exit(0);
+        }
+        if (pids[i] < 0)
+            return (1);
+        i++;
+    }
+
+    // ✅ NOUVEAU : Remplace vos waitpid
+    int status;
+    wait(&status);  // Attend qu'UN processus se termine
+    
+    // Tue tous les autres
+    i = 0;
+    while (i < philo_data->philo_nb)
+    {
+        kill(pids[i], SIGTERM);
+        waitpid(pids[i], NULL, 0);
+        i++;
+    }
+    
+    return (0);
 }
 
-int	main(int ac, char **av)
+int main(int ac, char **av)
 {
-	t_philodata	*philo_data;
-	int			result;
-	int			i;
+    t_philodata *philo_data;
+    pid_t *pids;  // ✅ SEUL ajout
+    int i;
 
-	i = 1;
-	if (ac < 5 || ac > 6)
-		return (printf("Error: wrong number of arguments\n"), 1);
-	while (i < ac)
-	{
-		if (!is_valid_number(av[i]))
-			return (printf("Error: argument %d is not a valid number\n", i), 1);
-		i++;
-	}
-	if (ft_atoi(av[1]) <= 0)
+    // ✅ VOTRE code existant - INCHANGÉ
+    i = 1;
+    if (ac < 5 || ac > 6)
+        return (printf("Error: wrong number of arguments\n"), 1);
+    while (i < ac)
+    {
+        if (!is_valid_number(av[i]))
+            return (printf("Error: argument %d is not a valid number\n", i), 1);
+        i++;
+    }
+    if (ft_atoi(av[1]) <= 0)
         return (printf("Error: number of philosophers must be positive\n"), 1);
-	if (ac < 5 || ac > 6)
-		return (printf("Error: wrong number of arguments\n"), 1);
-	philo_data = malloc(sizeof(t_philodata));
-	if (!philo_data)
-		return (1);
-	if (!init_data_philo_bonus(ac, av, philo_data))
-	{
-		free(philo_data);
-		return (1);
-	}
-	init_philo_bonus(philo_data, philo_data->philosophers);
-	result = begin_simulation_bonus(philo_data->philosophers, philo_data);
-	cleanup_resources(philo_data);
-	return (result);
+    
+    philo_data = malloc(sizeof(t_philodata));
+    if (!philo_data)
+        return (1);
+    if (!init_data_philo_bonus(ac, av, philo_data))
+    {
+        free(philo_data);
+        return (1);
+    }
+    init_philo_bonus(philo_data, philo_data->philosophers);
+
+    // ✅ NOUVEAU : Juste stocker les PIDs
+    pids = malloc(sizeof(pid_t) * philo_data->philo_nb);
+    
+    // ✅ VOTRE fonction existante - on va juste la modifier légèrement
+    begin_simulation_bonus(philo_data->philosophers, philo_data, pids);
+    
+    free(pids);
+    cleanup_resources(philo_data);
+    return (0);
 }

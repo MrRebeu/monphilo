@@ -12,24 +12,34 @@
 
 #include "philosophers_bonus.h"
 
-void	take_forks(t_philo *philo, long long *last_meal_time)
+void take_forks(t_philo *philo, long long *last_meal_time)
 {
-	t_philodata	*philo_data;
-
-	philo_data = philo->philo_data;
-	if (get_time_ms() - *last_meal_time > philo_data->time_to_die)
-	{
-		sem_wait(philo_data->write_sem);
-		printf("%lld %d died\n", get_time_ms() - philo_data->start_time,
-			philo->id);
-		sem_post(philo_data->write_sem);
-		sem_post(philo_data->end_sem);
-		return ;
-	}
-	sem_wait(philo_data->forks_sem);
-	print_status(philo_data, philo->id, "has taken a fork");
-	sem_wait(philo_data->forks_sem);
-	print_status(philo_data, philo->id, "has taken a fork");
+    t_philodata *philo_data = philo->philo_data;
+    
+    // ✅ Vérifier AVANT de prendre les fourchettes
+    if (get_time_ms() - *last_meal_time > philo_data->time_to_die)
+    {
+        sem_wait(philo_data->write_sem);
+        printf("%lld %d died\n", get_time_ms() - philo_data->start_time, philo->id);
+        sem_post(philo_data->write_sem);
+        exit(1);
+    }
+    
+    sem_wait(philo_data->forks_sem);
+    
+    // ✅ Vérifier APRÈS avoir pris la première fourchette
+    if (get_time_ms() - *last_meal_time > philo_data->time_to_die)
+    {
+        sem_post(philo_data->forks_sem); // Libérer la fourchette
+        sem_wait(philo_data->write_sem);
+        printf("%lld %d died\n", get_time_ms() - philo_data->start_time, philo->id);
+        sem_post(philo_data->write_sem);
+        exit(1);
+    }
+    
+    print_status(philo_data, philo->id, "has taken a fork");
+    sem_wait(philo_data->forks_sem);
+    print_status(philo_data, philo->id, "has taken a fork");
 }
 
 int	eat(t_philo *philo, long long *last_meal_time)
@@ -89,7 +99,7 @@ void	philosopher_routine_bonus(t_philo *philo)
 	philo_data = philo->philo_data;
 	last_meal_time = philo_data->start_time;
 	if (philo->id % 2 == 0)
-		usleep(5000);
+		usleep(100);
 	while (1)
 	{
 		if (check_end_signal(philo_data))
