@@ -64,54 +64,48 @@ void	*monitor_philosophers_bonus(void *arg)
 	return (NULL);
 }
 
-// ✅ Changement de signature : ajout du paramètre pids
 int begin_simulation_bonus(t_philo *philosophers, t_philodata *philo_data, pid_t *pids)
 {
-	(void)philosophers;
+    (void)philosophers;  // ✅ Éviter le warning
     int i;
-
-    // ✅ VOTRE code pour 1 philo - INCHANGÉ
-    if (philo_data->philo_nb == 1)
+    pthread_t meal_thread;
+    
+    // Cas 1 philosophe...
+    
+    // Créer le thread meal_checker si nécessaire
+    if (philo_data->must_eat > 0)
     {
-        pids[0] = fork();  // ✅ Juste stocker le PID
-        if (pids[0] == 0)
-        {
-            print_status(philo_data, 1, "has taken a fork");
-            ft_sleep(philo_data->time_to_die);
-            printf("%lld %d died\n", get_time_ms() - philo_data->start_time, 1);
-            exit(1);
-        }
-        waitpid(pids[0], NULL, 0);
-        return (0);
+        pthread_create(&meal_thread, NULL, meal_checker, philo_data);
+        pthread_detach(meal_thread);
     }
-
-    // ✅ VOTRE code fork - INCHANGÉ sauf stockage PID
+    
+    // Fork tous les philosophes
     i = 0;
     while (i < philo_data->philo_nb)
     {
-        pids[i] = fork();  // ✅ Stocker le PID
+        pids[i] = fork();
         if (pids[i] == 0)
         {
             philosopher_routine_bonus(&philo_data->philosophers[i]);
             exit(0);
         }
-        if (pids[i] < 0)
-            return (1);
         i++;
     }
-
-    // ✅ NOUVEAU : Remplace vos waitpid
-    int status;
-    wait(&status);  // Attend qu'UN processus se termine
     
-    // Tue tous les autres
+    // Attendre qu'un processus se termine
+    waitpid(-1, NULL, 0);
+    
+    // Tuer tous les autres
     i = 0;
     while (i < philo_data->philo_nb)
     {
-        kill(pids[i], SIGTERM);
-        waitpid(pids[i], NULL, 0);
+        if (pids[i] > 0)
+            kill(pids[i], SIGTERM);
         i++;
     }
+    
+    // Attendre que tous se terminent
+    while (wait(NULL) > 0);
     
     return (0);
 }

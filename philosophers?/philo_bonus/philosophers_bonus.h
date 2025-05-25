@@ -53,8 +53,10 @@ typedef struct s_philodata
 	sem_t				*simulation_sem;
 	sem_t				*end_sem;
 	sem_t				*finished_eating_sem;
+	pthread_t       death_thread; 
 }						t_philodata;
 
+void *meal_checker(void *arg);
 int						check_simulation_status_bonus(t_philodata *data);
 void					init_philo_bonus(t_philodata *philo_data,
 							t_philo *philosophers);

@@ -57,6 +57,8 @@ int	check_simulation_status_bonus(t_philodata *data)
 
 void	cleanup_resources(t_philodata *philo_data)
 {
+	sem_close(philo_data->finished_eating_sem);  // ✅ AJOUTER
+	sem_unlink("/finished_eating"); 
 	sem_close(philo_data->simulation_sem);
 	sem_close(philo_data->forks_sem);
 	sem_close(philo_data->write_sem);

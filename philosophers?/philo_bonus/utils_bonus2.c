@@ -50,7 +50,7 @@ void	ft_sleep(long long duration_ms)
 		elapsed_time = current_time - start_time;
 		if (elapsed_time > duration_ms)
 			break ;
-		usleep(95);
+		usleep(1000);
 	}
 }
 
