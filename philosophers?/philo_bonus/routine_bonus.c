@@ -6,7 +6,7 @@
 /*   By: abkhefif <abkhefif@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/26 14:53:28 by abkhefif          #+#    #+#             */
-/*   Updated: 2025/05/25 18:25:38 by abkhefif         ###   ########.fr       */
+/*   Updated: 2025/05/25 18:41:41 by abkhefif         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -55,7 +55,7 @@ void	*death_checker(void *arg)
 			exit(1);
 		}
 		sem_post(data->status_sem);
-		usleep(2000);
+		usleep(100);
 	}
 	return (NULL);
 }
@@ -114,18 +114,14 @@ void	philosopher_routine_bonus(t_philo *philo)
 		exit(1);
 	pthread_detach(death_thread);
 	if (philo->id % 2 == 0)
-		usleep(15000);
+        usleep(philo_data->time_to_eat * 500);;
 	while (1)
-	{
-		if (check_end_signal(philo_data))
-			break ;
-		take_forks(philo, &last_meal_time);
-		sem_wait(philo_data->status_sem);
-		philo->last_meal_time = get_time_ms();
-		last_meal_time = philo->last_meal_time;
-		sem_post(philo_data->status_sem);
-		if (!eat(philo, &last_meal_time))
-			break ;
-		sleep_and_think(philo, &last_meal_time);
-	}
+    {
+       if (check_end_signal(philo_data))
+            break ;
+        take_forks(philo, &last_meal_time);
+        if (!eat(philo, &last_meal_time))  // ← Mise à jour ici seulement
+            break ;
+        sleep_and_think(philo, &last_meal_time);
+    }
 }
